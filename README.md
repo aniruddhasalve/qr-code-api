@@ -4,7 +4,7 @@
 
 POST /encode returns a deterministic SVG placeholder contract, with an optional qrcode CLI adapter for production generation.
 
-This is a small reusable Python 3.11 service with no AI components and one small non-AI runtime dependency (`qrcode`). It uses the standard library HTTP server so it can be copied into internal automation, extended, or deployed behind a reverse proxy.
+This is a small reusable Python 3.11 service with one small runtime dependency (`qrcode`). It uses the standard library HTTP server so it can be copied into internal automation, extended, or deployed behind a reverse proxy.
 
 ## Run
 
