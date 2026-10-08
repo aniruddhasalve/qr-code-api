@@ -38,15 +38,20 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *_): pass
 
 
-import html, os, subprocess, tempfile, base64
+import io, html, os, subprocess, tempfile, base64
+import qrcode
+from qrcode.image.svg import SvgPathImage
 
 def handle(method, path, payload):
     if method == "GET" and path == "/health": return response(200, {"ok": True, "service": "qr-code-api"})
     if method != "POST" or path != "/encode": return error("route not found", 404)
     text = payload.get("text") if isinstance(payload, dict) else None
     if not isinstance(text, str) or not text: return error("text is required")
-    svg = '<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240"><rect width="240" height="240" fill="white"/><text x="12" y="120" font-size="12">QR payload: '+html.escape(text[:80])+'</text></svg>'
-    return response(200, {"format":"svg", "svg":svg, "text":text})
+    qr = qrcode.QRCode(box_size=8, border=4)
+    qr.add_data(text); qr.make(fit=True)
+    image = qr.make_image(image_factory=SvgPathImage)
+    output = io.BytesIO(); image.save(output)
+    return response(200, {"format":"svg", "svg":output.getvalue().decode(), "text":text})
 
 
 def serve(host="0.0.0.0", port=8080):
